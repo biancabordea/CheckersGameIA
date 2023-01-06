@@ -1,0 +1,11 @@
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\bin\Debug\SimpleCheckers.exe.config
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\bin\Debug\SimpleCheckers.exe
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\bin\Debug\SimpleCheckers.pdb
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.csproj.AssemblyReference.cache
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.csproj.SuggestedBindingRedirects.cache
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.MainForm.resources
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.Properties.Resources.resources
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.csproj.GenerateResource.cache
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.csproj.CoreCompileInputs.cache
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.exe
+D:\AN 4\SEM 1\IA\PROIECT\LaboratorIA07\Interfata\obj\Debug\SimpleCheckers.pdb
