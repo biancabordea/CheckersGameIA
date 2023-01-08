@@ -31,7 +31,7 @@ namespace SimpleCheckers
         public Board()
         {
             Size = 8; // tabla este 8x8
-            Pieces = new List<Piece>(Size * 3);
+            Pieces = new List<Piece>(Size * 3); // fiecare jucator are 3 randuri de piese
             int randuriMax = 0;
             int id = 0;
 
