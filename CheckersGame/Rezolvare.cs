@@ -27,7 +27,7 @@ namespace SimpleCheckers
         /// La final se face diferenta intre punctele human si pc.
         /// </summary>
         /// <returns> Valoarea asignata tablei de joc </returns>
-        
+
     }
 
     //=============================================================================================================================
@@ -43,9 +43,9 @@ namespace SimpleCheckers
             //throw new Exception("Aceasta metoda trebuie implementata");
             List<Move> validMoves = new List<Move>();
 
-            for (int x = -1; x <= 1; ++x)
+            for (int x = -2; x <= 2; ++x)
             {
-                for (int y = -1; y <= 1; ++y)
+                for (int y = -2; y <= 2; ++y)
                 {
                     Move move = new Move(Id, X + x, Y + y);
                     if (IsValidMove(currentBoard, move))
@@ -85,13 +85,25 @@ namespace SimpleCheckers
                 }
             }
 
-            // verificam ca distanta dintre pozitia curenta si noua mutare este 1
+            
             int xDiff = Math.Abs(move.NewX - X);
             int yDiff = Math.Abs(move.NewY - Y);
-            if (xDiff > 1 && yDiff > 1)
+            // mutarea nu are voie in acest stadiu sa fie mai mare de 1 patrat
+            if (xDiff == 2 && yDiff == 2)
             {
-                return false;
+                // verificam ca distanta dintre pozitia curenta si noua mutare este 1
+                if (xDiff > 1 && yDiff > 1)
+                {
+                    return false;
+                }
+
+                // pionul se va misca doar pe diagonala
+                if (Y != move.NewY - (move.NewX - X) && Y != move.NewY + (move.NewX - X))
+                {
+                    return false;
+                }
             }
+
 
             // verificam daca pionul este dama, deoarece acest pion nu se poate intoarce
             if (currentBoard.Pieces[move.PieceId].PieceType == PieceType.Checker)
@@ -106,32 +118,87 @@ namespace SimpleCheckers
                 }
             }
 
+
             // mutare pe diagonala peste 2 casete, cand unul dintre pioni fura poinul celuilalt
             if (xDiff == 2 && yDiff == 2)
             {
+                bool skip = false;
+
+                int skipX = -1 , skipY = -1; // piesa peste care sa se sara
+
+                if (move.NewX - X > 0 && move.NewY - Y > 0) // dreapta-sus
+                {
+                    skipX = X + 1;
+                    skipY = Y + 1;
+                }
+                else if (move.NewX - X > 0 && move.NewY - Y < 0) //dreapta-jos
+                {
+                    skipX = X + 1;
+                    skipY = Y - 1;
+                }
+                else if (move.NewX - X < 0 && move.NewY - Y < 0) //stanga-jos
+                {
+                    skipX = X - 1;
+                    skipY = Y - 1;
+                }
+                else if (move.NewX - X < 0 && move.NewY - Y > 0) // stanga-sus
+                {
+                    skipX = X - 1;
+                    skipY = Y + 1;
+                }
+                
+
                 foreach (Piece piece in currentBoard.Pieces)
+                { 
+
+                    if (piece.X == skipX || piece.Y == skipY) // nu sunt inca sigura..trebuie sa verific cand functiile vor
+                    {
+                        if (!isOpponent(piece.Player)) // daca pe caseta nu este o piesa oponent
+                        {
+                            return false;
+                        }
+                        skip = false;
+                        break; // mutarea este valida
+
+                    }
+                   
+                }
+                if (!skip)
                 {
                     return false;
                 }
             }
 
-                return true;
-            
+            return true;
+
         }
-    
 
-    //=============================================================================================================================
-
-    public partial class Minimax
-    {
-        /// <summary>
-        /// Primeste o configuratie ca parametru, cauta mutarea optima si returneaza configuratia
-        /// care rezulta prin aplicarea acestei mutari optime
-        /// </summary>
-        public static Board FindNextBoard(Board currentBoard)
+        private bool isOpponent(PlayerType player)
         {
-            throw new Exception("Aceasta metoda trebuie implementata");
-           
+            bool isOpponent = true;
+
+            if ((player == PlayerType.Computer && Player == PlayerType.Computer) || (player == PlayerType.Human && Player == PlayerType.Human)) // daca ambele piese sunt acele calculatorului/persoanei in acelasi timp
+            {
+                isOpponent = false;
+            }
+            return isOpponent;
         }
     }
+
+
+        //=============================================================================================================================
+
+        public partial class Minimax
+        {
+            /// <summary>
+            /// Primeste o configuratie ca parametru, cauta mutarea optima si returneaza configuratia
+            /// care rezulta prin aplicarea acestei mutari optime
+            /// </summary>
+            public static Board FindNextBoard(Board currentBoard)
+            {
+                throw new Exception("Aceasta metoda trebuie implementata");
+
+            }
+        }
+    
 }
