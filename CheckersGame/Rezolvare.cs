@@ -18,15 +18,11 @@ namespace SimpleCheckers
                 diff += piece.Y;
 
             }
-            return 12 - diff;
+            return 56 - diff;
+
         }
 
-        /// <summary>
-        /// Strategia masoara pentru fiecare piesa cate pozitii trebuie sa mearga pentru a ajunge la finish.
-        /// Piesele sunt considerate obstacole si se face algoritmul lui Lee petru fiecare piesa in parte.
-        /// La final se face diferenta intre punctele human si pc.
-        /// </summary>
-        /// <returns> Valoarea asignata tablei de joc </returns>
+      
 
     }
 
@@ -151,7 +147,7 @@ namespace SimpleCheckers
                 foreach (Piece piece in currentBoard.Pieces)
                 { 
 
-                    if (piece.X == skipX || piece.Y == skipY) // nu sunt inca sigura..trebuie sa verific cand functiile vor
+                    if (piece.X == skipX || piece.Y == skipY) 
                     {
                         if (!isOpponent(piece.Player)) // daca pe caseta nu este o piesa oponent
                         {
