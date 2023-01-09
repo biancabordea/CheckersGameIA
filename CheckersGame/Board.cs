@@ -78,10 +78,27 @@ namespace SimpleCheckers
         public Board MakeMove(Move move)
         {
             Board nextBoard = new Board(this); // copy
+
             nextBoard.Pieces[move.PieceId].X = move.NewX;
             nextBoard.Pieces[move.PieceId].Y = move.NewY;
+
+            // daca exista pe diagonala un oponent, poate fi capturat
+
+
+
+
+            // dama devine rege cand ajunge pe ultimul rand al adversarului
+            if ((nextBoard.Pieces[move.PieceId].Player == PlayerType.Human || nextBoard.Pieces[move.PieceId].Player == PlayerType.Computer ) && 
+                nextBoard.Pieces[move.PieceId].PieceType != PieceType.King && move.NewY == Size - 1 )
+            {
+                nextBoard.Pieces[move.PieceId].PieceType = PieceType.King;
+            }
+           
+
             return nextBoard;
         }
+
+
 
         /// <summary>
         /// Verifica daca configuratia curenta este castigatoare
