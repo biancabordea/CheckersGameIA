@@ -65,7 +65,12 @@ namespace SimpleCheckers
             SolidBrush transparentRed = new SolidBrush(Color.FromArgb(192, 255, 0, 0));
             SolidBrush transparentGreen = new SolidBrush(Color.FromArgb(192, 0, 128, 0));
             SolidBrush transparentYellow = new SolidBrush(Color.FromArgb(192, 255, 255, 0));
-            
+
+            // marcam faptul ca o dama devine regina
+            SolidBrush transparentKing = new SolidBrush(Color.FromArgb(192, 128, 0, 0));
+
+            // trebuie sa adaugam pentru regine
+
 
             foreach (Piece p in _board.Pieces)
             {
@@ -80,6 +85,14 @@ namespace SimpleCheckers
 
               //  e.Graphics.FillEllipse(brush, 12 + p.X * 125, dy - p.Y * 125, 100, 100);
                 e.Graphics.FillEllipse(brush, (float)(6 + p.X * 62.5), (float)(dy - p.Y * 62.5), 50, 50);
+
+                // daca o dama devine regina, se va marca acest lucru
+                if (p.PieceType == PieceType.King)
+                {
+                    brush = transparentKing;
+                    e.Graphics.FillEllipse(brush, (float)(6 + p.X * 62.5), (float)(dy - p.Y * 62.5), 25, 25);
+
+                }
             }
         }
 
@@ -136,7 +149,12 @@ namespace SimpleCheckers
 
         private void ComputerMove()
         {
-            Board nextBoard = Minimax.FindNextBoard(_board);
+            // Board nextBoard = Minimax.FindNextBoard(_board);
+            ActionsGame action = new ActionsGame();
+            action.board = _board;
+            action.evaluation = _board.EvaluationFunction();
+            Board nextBoard = Minimax.AlphaBetaPruningFunction(action, true, Minimax.maxDepth, Double.NegativeInfinity, Double.PositiveInfinity).board;
+
             AnimateTransition(_board, nextBoard);
             _board = nextBoard;
             pictureBoxBoard.Refresh();
@@ -231,6 +249,11 @@ namespace SimpleCheckers
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
         {
 
         }

@@ -190,11 +190,111 @@ namespace SimpleCheckers
             /// Primeste o configuratie ca parametru, cauta mutarea optima si returneaza configuratia
             /// care rezulta prin aplicarea acestei mutari optime
             /// </summary>
-            public static Board FindNextBoard(Board currentBoard)
+           /* public static Board FindNextBoard(Board currentBoard)
             {
                 throw new Exception("Aceasta metoda trebuie implementata");
 
             }
+           */
+
+            public static ActionsGame AlphaBetaPruningFunction(ActionsGame node, bool maxLevel,  int depth, double alfa, double beta)
+            {
+                PlayerType winner;
+                bool finished;
+                node.board.CheckFinish(out finished, out winner);
+                // daca jocul s-a terminat/ s-a ajuns intr-un nod terminal/s-a ajuns la adancimea max 
+                if (depth <= 0 || finished) // am ajuns pe nod terminal, la limita de adancime impusa, sau jocul s-a incheiat
+                {
+                    return node;
+                }
+                // jucatorul maximizant este calc si cel minimizant este persoana
+                ActionsGame result = new ActionsGame();
+
+            // in cazul in care jucatorul este persoana
+            if (!maxLevel)
+            {
+                result.evaluation = Double.PositiveInfinity;
+                List<Board> possibleConifg = TakePossibleConfig(PlayerType.Human, node);
+
+                // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
+                foreach (Board board in possibleConifg)
+                {
+                    // creeam cate o configuratie din cele posibile
+                    ActionsGame action = new ActionsGame();
+                    action.board = board;
+                    action.evaluation = board.EvaluationFunction();
+
+                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                    // val optima
+                    if (nextAction.evaluation < result.evaluation) // consideram valoarea maxima a functiei de evaluare
+                    {
+                        result = nextAction; // se trece la urmatoarea actiune
+                        result.board = board;
+                    }
+
+                    if (alfa >= beta) // nu se mai incearca alte actiuni
+                    {
+                        break;
+                    }
+
+                    beta = Math.Min(beta, result.evaluation);
+                }
+            }
+            else // in cazul in care jucatorul este computer
+            {
+                result.evaluation = Double.NegativeInfinity;
+                List<Board> possibleConifg = TakePossibleConfig(PlayerType.Computer, node);
+
+                // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
+                foreach (Board board in possibleConifg)
+                {
+                    // creeam cate o configuratie din cele posibile
+                    ActionsGame action = new ActionsGame();
+                    action.board = board;
+                    action.evaluation = board.EvaluationFunction();
+
+                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                    // val optima
+                    if (nextAction.evaluation > result.evaluation) // consideram valoarea maxima a functiei de evaluare
+                    {
+                        result = nextAction; // se trece la urmatoarea actiune
+                        result.board = board;
+                    }
+
+                    if (alfa >= beta) // nu se mai incearca alte actiuni
+                    {
+                        break;
+                    }
+
+                    alfa = Math.Max(alfa, result.evaluation);
+                }
+            }
+                return result;
+            }
+            
+            /// <summary>
+            /// Functie care va parcurge fiecare piesa de pe tabla si va returna o lista cu configuratiile posibile
+            /// </summary>
+            private static List<Board> TakePossibleConfig(PlayerType player, ActionsGame config)
+            {
+                List<Board> candidates = new List<Board>();
+                
+            // pentru fiecare piesa de pe tabla
+                foreach (Piece piece in config.board.Pieces)
+                {
+                    // se verifica tipul jucatorului pentru a putea ajuta urmatorul pas in functia principala
+                    if ( piece.Player == player )
+                    {
+                        // pentru mutarile valide ale piesei curente, se va realiza o configuratia posibila
+                        foreach (Move move in piece.ValidMoves(config.board))
+                        {
+                            candidates.Add(config.board.MakeMove(move));
+                        }
+                    }
+                }
+                    return candidates;
+            }
+            
         }
     
 }
