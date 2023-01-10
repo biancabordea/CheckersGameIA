@@ -26,6 +26,8 @@ namespace SimpleCheckers
     {
         public int Size { get; set; } // dimensiunea tablei de joc
         public List<Piece> Pieces { get; set; } // lista de piese, atat ale omului cat si ale calculatorului
+        // public bool captureMade { get; set; } // daca s-a efectuat o captura in configuratia anterioara configuratiei curente
+
 
         // configuratie tabla de joc
         public Board()
@@ -83,17 +85,59 @@ namespace SimpleCheckers
             nextBoard.Pieces[move.PieceId].Y = move.NewY;
 
             // daca exista pe diagonala un oponent, poate fi capturat
+            int capturedPieceX = 0, capturedPieceY = 0;
+            //se sare fix peste un oponent pe diagonala
+            if (System.Math.Abs(move.NewX - nextBoard.Pieces[move.PieceId].X) == 2 && System.Math.Abs(move.NewY - nextBoard.Pieces[move.PieceId].Y) == 2)
+            {
+                // stanga sus
+                if (move.NewX - nextBoard.Pieces[move.PieceId].X < 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y > 0)
+                {
+                    capturedPieceX = nextBoard.Pieces[move.PieceId].X - 1;
+                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y + 1;
+                }
+                //dreapta sus
+                else if (move.NewX - nextBoard.Pieces[move.PieceId].X > 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y > 0)
+                {
+                    capturedPieceX = nextBoard.Pieces[move.PieceId].X + 1;
+                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y + 1;
+                }
+                //stanga jos
+                else if (move.NewX - nextBoard.Pieces[move.PieceId].X < 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y < 0)
+                {
+                    capturedPieceX = nextBoard.Pieces[move.PieceId].X - 1;
+                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y - 1;
+                }
+                //dreapta jos
+                else if (move.NewX - nextBoard.Pieces[move.PieceId].X > 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y < 0)
+                {
+                    capturedPieceX = nextBoard.Pieces[move.PieceId].X + 1;
+                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y - 1;
+                }
 
-
-
+                //eliminam piesa oponent de pe tabla
+                foreach (Piece piece in Pieces)
+                {
+                    if (piece.X == capturedPieceX && piece.Y == capturedPieceY)
+                    {
+                        piece.X = -1;
+                        piece.Y = -1;
+                        // nextBoard.captureMade = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // nextBoard.captureMade = false;
+            }
 
             // dama devine rege cand ajunge pe ultimul rand al adversarului
-            if ((nextBoard.Pieces[move.PieceId].Player == PlayerType.Human || nextBoard.Pieces[move.PieceId].Player == PlayerType.Computer ) && 
-                nextBoard.Pieces[move.PieceId].PieceType != PieceType.King && move.NewY == Size - 1 )
+            if ((nextBoard.Pieces[move.PieceId].Player == PlayerType.Human || nextBoard.Pieces[move.PieceId].Player == PlayerType.Computer) &&
+                nextBoard.Pieces[move.PieceId].PieceType != PieceType.King && move.NewY == Size - 1)
             {
                 nextBoard.Pieces[move.PieceId].PieceType = PieceType.King;
             }
-           
+
 
             return nextBoard;
         }

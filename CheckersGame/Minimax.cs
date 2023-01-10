@@ -9,6 +9,8 @@ namespace SimpleCheckers
     {
         private static Random _rand = new Random();
 
+        public static int maxDepth = 4;
+
         //public static Board FindNextBoard(Board currentBoard) - completati aceasta metoda in fisierul Rezolvare.cs
     }
 }
