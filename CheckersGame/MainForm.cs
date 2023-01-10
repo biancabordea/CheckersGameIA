@@ -67,7 +67,7 @@ namespace SimpleCheckers
             SolidBrush transparentYellow = new SolidBrush(Color.FromArgb(192, 255, 255, 0));
 
             // marcam faptul ca o dama devine regina
-            SolidBrush transparentQueen = new SolidBrush(Color.FromArgb(192, 128, 0, 0));
+            SolidBrush transparentQueen = new SolidBrush(Color.FromArgb(255, 255, 255, 0));
 
             // trebuie sa adaugam pentru regine
 
@@ -87,10 +87,10 @@ namespace SimpleCheckers
                 e.Graphics.FillEllipse(brush, (float)(6 + p.X * 62.5), (float)(dy - p.Y * 62.5), 50, 50);
 
                 // daca o dama devine regina, se va marca acest lucru
-                if (p.PieceType == PieceType.King)
+                if (p.PieceType == PieceType.Queen)
                 {
                     brush = transparentQueen;
-                    e.Graphics.FillEllipse(brush, (float)(6 + p.X * 62.5), (float)(dy - p.Y * 62.5), 25, 25);
+                    e.Graphics.FillEllipse(brush, (float)(18 + p.X * 62.5), (float)(dy - p.Y * 62.5 + 12), 25, 25);
 
                 }
             }
@@ -190,7 +190,7 @@ namespace SimpleCheckers
             float dy = 500 - 62.5f + 6;
             SolidBrush transparentRed = new SolidBrush(Color.FromArgb(192, 255, 0, 0));
              SolidBrush transparentGreen = new SolidBrush(Color.FromArgb(192, 0, 128, 0));
-            SolidBrush transparentKing = new SolidBrush(Color.FromArgb(192, 128, 0, 0));
+            SolidBrush transparentQueen = new SolidBrush(Color.FromArgb(255, 255, 255, 0));
 
 
             Bitmap final = new Bitmap(500, 500);
@@ -214,10 +214,10 @@ namespace SimpleCheckers
                     //g.FillEllipse(brush, (int)(12 + avx * 125), (int)(dy - avy * 125), 100, 100);
                     g.FillEllipse(brush, (float)(6 + avx * 62.5), (float)(dy - avy * 62.5), 50, 50);
 
-                    if (b1.Pieces[i].PieceType == PieceType.King)
+                    if (b1.Pieces[i].PieceType == PieceType.Queen)
                     {
-                        brush = transparentKing;
-                       g.FillEllipse(brush, (float)(6 + avx * 62.5), (float)(dy - avy * 62.5), 25, 25);
+                        brush = transparentQueen;
+                       g.FillEllipse(brush, (float)(18 + avx * 62.5), (float)(dy - avy * 62.5 + 12), 25, 25);
 
                     }
                 }
