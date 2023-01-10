@@ -34,12 +34,13 @@ namespace SimpleCheckers
         public PlayerType Player { get; set; } // carui tip de jucator apartine piesa (om sau calculator)
         public PieceType PieceType { get; set;  }
 
-        public Piece(int x, int y, int id, PlayerType player)
+        public Piece(int x, int y, int id, PlayerType player, PieceType pieceType)
         {
             X = x;
             Y = y;
             Id = id;
             Player = player;
+            PieceType = pieceType;
         }
 
         // public List<Move> ValidMoves(Board currentBoard) - completati aceasta metoda in fisierul Rezolvare.cs

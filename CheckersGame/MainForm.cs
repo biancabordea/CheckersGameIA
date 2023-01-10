@@ -190,13 +190,13 @@ namespace SimpleCheckers
             float dy = 500 - 62.5f + 6;
             SolidBrush transparentRed = new SolidBrush(Color.FromArgb(192, 255, 0, 0));
              SolidBrush transparentGreen = new SolidBrush(Color.FromArgb(192, 0, 128, 0));
-           
-            
+            SolidBrush transparentKing = new SolidBrush(Color.FromArgb(192, 128, 0, 0));
+
 
             Bitmap final = new Bitmap(500, 500);
             Graphics g = Graphics.FromImage(final);
 
-            int noSteps = 50;
+            int noSteps = 25;
 
             for (int j = 1; j < noSteps; j++)
             {
@@ -213,6 +213,13 @@ namespace SimpleCheckers
 
                     //g.FillEllipse(brush, (int)(12 + avx * 125), (int)(dy - avy * 125), 100, 100);
                     g.FillEllipse(brush, (float)(6 + avx * 62.5), (float)(dy - avy * 62.5), 50, 50);
+
+                    if (b1.Pieces[i].PieceType == PieceType.King)
+                    {
+                        brush = transparentKing;
+                       g.FillEllipse(brush, (float)(6 + avx * 62.5), (float)(dy - avy * 62.5), 25, 25);
+
+                    }
                 }
 
                 Graphics pbg = pictureBoxBoard.CreateGraphics();
