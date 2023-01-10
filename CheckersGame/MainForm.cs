@@ -67,7 +67,7 @@ namespace SimpleCheckers
             SolidBrush transparentYellow = new SolidBrush(Color.FromArgb(192, 255, 255, 0));
 
             // marcam faptul ca o dama devine regina
-            SolidBrush transparentKing = new SolidBrush(Color.FromArgb(192, 128, 0, 0));
+            SolidBrush transparentQueen = new SolidBrush(Color.FromArgb(192, 128, 0, 0));
 
             // trebuie sa adaugam pentru regine
 
@@ -89,7 +89,7 @@ namespace SimpleCheckers
                 // daca o dama devine regina, se va marca acest lucru
                 if (p.PieceType == PieceType.King)
                 {
-                    brush = transparentKing;
+                    brush = transparentQueen;
                     e.Graphics.FillEllipse(brush, (float)(6 + p.X * 62.5), (float)(dy - p.Y * 62.5), 25, 25);
 
                 }
@@ -101,8 +101,8 @@ namespace SimpleCheckers
             if (_currentPlayer != PlayerType.Human)
                 return;
 
-            int mouseX = e.X / 125;
-            int mouseY = 3 - e.Y / 125;
+            int mouseX = (int)Math.Truncate((float)e.X / 62.5f);
+            int mouseY = (int)(6 - Math.Truncate(e.Y / 62.5f) + 1);
 
             if (_selected == -1)
             {
