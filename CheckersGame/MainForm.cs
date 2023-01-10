@@ -101,8 +101,8 @@ namespace SimpleCheckers
             if (_currentPlayer != PlayerType.Human)
                 return;
 
-            int mouseX = e.X / 125;
-            int mouseY = 3 - e.Y / 125;
+            int mouseX = (int)Math.Truncate((float)e.X / 62.5f);
+            int mouseY = (int)(6 - Math.Truncate(e.Y / 62.5f) + 1);
 
             if (_selected == -1)
             {
