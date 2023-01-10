@@ -70,6 +70,25 @@ namespace SimpleCheckers
             // sare mai multe careuri, cu exceptia cand poate manca un adversat pe diagonala
 
 
+
+            int xDiff = Math.Abs(move.NewX - X);
+            int yDiff = Math.Abs(move.NewY - Y);
+            // mutarea nu are voie in acest stadiu sa fie mai mare de 1 patrat
+            if (!(xDiff == 2 && yDiff == 2))
+            {
+                // verificam ca distanta dintre pozitia curenta si noua mutare este 1
+                if (xDiff > 1 && yDiff > 1)
+                {
+                    return false;
+                }
+
+                // pionul se va misca doar pe diagonala
+                if (Y != move.NewY - (move.NewX - X) && Y != move.NewY + (move.NewX - X))
+                {
+                    return false;
+                }
+            }
+
             // verificam daca piesa este mutata sau daca nu depaseste careul
             if (move.NewX < 0 || move.NewY < 0 || move.NewX >= currentBoard.Size
                  || move.NewY >= currentBoard.Size)
@@ -86,37 +105,18 @@ namespace SimpleCheckers
                 }
             }
 
-            
-            int xDiff = Math.Abs(move.NewX - X);
-            int yDiff = Math.Abs(move.NewY - Y);
-            // mutarea nu are voie in acest stadiu sa fie mai mare de 1 patrat
-            if (xDiff == 2 && yDiff == 2)
-            {
-                // verificam ca distanta dintre pozitia curenta si noua mutare este 1
-                if (xDiff > 1 && yDiff > 1)
-                {
-                    return false;
-                }
-
-                // pionul se va misca doar pe diagonala
-                if (Y != move.NewY - (move.NewX - X) && Y != move.NewY + (move.NewX - X))
-                {
-                    return false;
-                }
-            }
+           
 
 
             // verificam daca pionul este dama, deoarece acest pion nu se poate intoarce
             if (currentBoard.Pieces[move.PieceId].PieceType == PieceType.Checker)
             {
-                if (currentBoard.Pieces[move.PieceId].Player == PlayerType.Human && move.NewY < currentBoard.Pieces[move.PieceId].Y)
+                if ((currentBoard.Pieces[move.PieceId].Player == PlayerType.Human && move.NewY < currentBoard.Pieces[move.PieceId].Y) ||
+                        (currentBoard.Pieces[move.PieceId].Player == PlayerType.Computer && move.NewY > currentBoard.Pieces[move.PieceId].Y))
                 {
                     return false;
                 }
-                else if (currentBoard.Pieces[move.PieceId].Player == PlayerType.Computer && move.NewY > currentBoard.Pieces[move.PieceId].Y)
-                {
-                    return false;
-                }
+                
             }
 
 
@@ -124,45 +124,41 @@ namespace SimpleCheckers
             if (xDiff == 2 && yDiff == 2)
             {
                 bool skip = false;
-
-                int skipX = -1 , skipY = -1; // piesa peste care sa se sara
+                int skipX = -1, skipY = -1; // piesa peste care sa se sara
 
                 if (move.NewX - X > 0 && move.NewY - Y > 0) // dreapta-sus
                 {
                     skipX = X + 1;
                     skipY = Y + 1;
                 }
-                else if (move.NewX - X > 0 && move.NewY - Y < 0) //dreapta-jos
-                {
-                    skipX = X + 1;
-                    skipY = Y - 1;
-                }
-                else if (move.NewX - X < 0 && move.NewY - Y < 0) //stanga-jos
-                {
-                    skipX = X - 1;
-                    skipY = Y - 1;
-                }
                 else if (move.NewX - X < 0 && move.NewY - Y > 0) // stanga-sus
                 {
                     skipX = X - 1;
                     skipY = Y + 1;
                 }
+                else if (move.NewX - X > 0 && move.NewY - Y < 0) // dreapta-jos
+                {
+                    skipX = X + 1;
+                    skipY = Y - 1;
+                }
+                else if (move.NewX - X < 0 && move.NewY - Y < 0) // stanga-jos
+                {
+                    skipX = X - 1;
+                    skipY = Y - 1;
+                }
+
                 
-
-                foreach (Piece piece in currentBoard.Pieces)
-                { 
-
-                    if (piece.X == skipX || piece.Y == skipY) 
+                foreach (Piece piesa in currentBoard.Pieces) 
+                {
+                    if (piesa.X == skipX && piesa.Y == skipY)
                     {
-                        if (!isOpponent(piece.Player)) // daca pe caseta nu este o piesa oponent
+                        if (!isOpponent(piesa.Player))
                         {
-                            return false;
+                            return false; 
                         }
-                        skip = false;
-                        break; // mutarea este valida
-
+                        skip = true;
+                        break; 
                     }
-                   
                 }
                 if (!skip)
                 {
@@ -215,66 +211,66 @@ namespace SimpleCheckers
                 // jucatorul maximizant este calc si cel minimizant este persoana
                 ActionsGame result = new ActionsGame();
 
-            // in cazul in care jucatorul este persoana
-            if (!maxLevel)
-            {
-                result.evaluation = Double.PositiveInfinity;
-                List<Board> possibleConifg = TakePossibleConfig(PlayerType.Human, node);
-
-                // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
-                foreach (Board board in possibleConifg)
+                // in cazul in care jucatorul este persoana
+                if (!maxLevel)
                 {
-                    // creeam cate o configuratie din cele posibile
-                    ActionsGame action = new ActionsGame();
-                    action.board = board;
-                    action.evaluation = board.EvaluationFunction();
+                    result.evaluation = Double.PositiveInfinity;
+                    List<Board> possibleConifg = TakePossibleConfig(PlayerType.Human, node);
 
-                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
-                    // val optima
-                    if (nextAction.evaluation < result.evaluation) // consideram valoarea maxima a functiei de evaluare
+                    // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
+                    foreach (Board board in possibleConifg)
                     {
-                        result = nextAction; // se trece la urmatoarea actiune
-                        result.board = board;
-                    }
+                        // creeam cate o configuratie din cele posibile
+                        ActionsGame action = new ActionsGame();
+                        action.board = board;
+                        action.evaluation = board.EvaluationFunction();
 
-                    if (alfa >= beta) // nu se mai incearca alte actiuni
-                    {
-                        break;
-                    }
+                        ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                        // val optima
+                        if (nextAction.evaluation < result.evaluation) // consideram valoarea maxima a functiei de evaluare
+                        {
+                            result = nextAction; // se trece la urmatoarea actiune
+                            result.board = board;
+                        }
 
-                    beta = Math.Min(beta, result.evaluation);
+                        if (alfa >= beta) // nu se mai incearca alte actiuni
+                        {
+                            break;
+                        }
+
+                        beta = Math.Min(beta, result.evaluation);
+                    }
                 }
-            }
-            else // in cazul in care jucatorul este computer
-            {
-                result.evaluation = Double.NegativeInfinity;
-                List<Board> possibleConifg = TakePossibleConfig(PlayerType.Computer, node);
-
-                // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
-                foreach (Board board in possibleConifg)
+                else // in cazul in care jucatorul este computer
                 {
-                    // creeam cate o configuratie din cele posibile
-                    ActionsGame action = new ActionsGame();
-                    action.board = board;
-                    action.evaluation = board.EvaluationFunction();
+                    result.evaluation = Double.NegativeInfinity;
+                    List<Board> possibleConifg = TakePossibleConfig(PlayerType.Computer, node);
 
-                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
-                    // val optima
-                    if (nextAction.evaluation > result.evaluation) // consideram valoarea maxima a functiei de evaluare
+                    // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
+                    foreach (Board board in possibleConifg)
                     {
-                        result = nextAction; // se trece la urmatoarea actiune
-                        result.board = board;
-                    }
+                        // creeam cate o configuratie din cele posibile
+                        ActionsGame action = new ActionsGame();
+                        action.board = board;
+                        action.evaluation = board.EvaluationFunction();
 
-                    if (alfa >= beta) // nu se mai incearca alte actiuni
-                    {
-                        break;
-                    }
+                        ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                        // val optima
+                        if (nextAction.evaluation > result.evaluation) // consideram valoarea maxima a functiei de evaluare
+                        {
+                            result = nextAction; // se trece la urmatoarea actiune
+                            result.board = board;
+                        }
 
-                    alfa = Math.Max(alfa, result.evaluation);
+                        if (alfa >= beta) // nu se mai incearca alte actiuni
+                        {
+                            break;
+                        }
+
+                        alfa = Math.Max(alfa, result.evaluation);
+                    }
                 }
-            }
-                return result;
+                    return result;
             }
             
             /// <summary>
