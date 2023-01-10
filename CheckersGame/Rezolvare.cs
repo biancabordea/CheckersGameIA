@@ -12,13 +12,188 @@ namespace SimpleCheckers
         public double EvaluationFunction()
         {
             //throw new Exception("Aceasta metoda trebuie implementata");
-            int diff = 0;
-            foreach (Piece piece in Pieces)
+            /* int diff = 0;
+               foreach (Piece piece in Pieces)
+               {
+                   if (piece.Player == PlayerType.Human)
+                   {
+                       continue;
+                   }
+                   diff += piece.Y;
+
+               }
+               return 56 - diff;*/
+
+            double valoareEuristica = 0;
+
+            // partea pentru jocul de inceput / de mijloc -> cand scopul principal este avansarea si incoronarea damelor
+            foreach (Piece piesa in Pieces)
             {
-                diff += piece.Y;
+                // functia de evaluare este considerata doar din punctul de vedere al calculatorului
+                if (piesa.Player == PlayerType.Human)
+                {
+                    continue;
+                }
+
+                if (piesa.PieceType == PieceType.Checker)
+                {
+                    if (piesa.Y < Size / 2) // dama are valoarea 7 + nr_rand in jumatatea opusa computer-ului
+                    {
+                        valoareEuristica += 7;
+                    }
+                    else // si are valoarea 5 + nr_rand in jumatatea computer-ului
+                    {
+                        valoareEuristica += 5;
+                    }
+                }
+                else if (piesa.PieceType == PieceType.King) // regele are valoarea 5 + nr_randuri + 2 indiferent de jumatatea in care se afla
+                {
+                    valoareEuristica += 10;
+                }
+
+                // pentru a avansa inspre centru
+                if (piesa.X > 0 && piesa.X < Size - 1 && piesa.Y > Size - 3 && piesa.Y < Size - 1)
+                {
+                    valoareEuristica += 2;
+                }
+
+                // pentru a controla centrul tablei de joc
+                if (piesa.X > 2 && piesa.X < Size - 2 && piesa.Y > 2 && piesa.Y < Size - 3)
+                {
+                    valoareEuristica += 5;
+                }
+
+                // pentru a avansa inspre zona de incoronare (doar pentru dame)
+                if (piesa.X > 0 && piesa.X < Size - 1 && piesa.Y > 0 && piesa.Y < 3 && piesa.PieceType == PieceType.Checker)
+                {
+                    valoareEuristica += 6;
+                }
+
+                // dam o importanta mare damelor cu posibilitate de incoronare, adica atunci cand sunt in penultimul rand, si pot muta pe ultimul
+                if (piesa.Y == 0 && piesa.PieceType == PieceType.Checker)
+                {
+                    valoareEuristica += 15;
+                }
+
+                // daca vreo piesa de-a computer-ului este in pericol de a fi capturata, dezavantajam mult configuratia obtinuta prin aceasta mutare (-50)
+
+                // pentru dreapta-sus
+                if (piesa.X < Size - 1 && piesa.Y < Size - 1)
+                {
+                    foreach (Piece piesaOm in Pieces)
+                    {
+                        // daca exista vreun rege de-al omului in dreapta-sus, atunci piesa este in pericol
+                        if (piesaOm.Player == PlayerType.Human && piesaOm.X == piesa.X + 1 && piesaOm.Y == piesa.Y + 1 && piesaOm.PieceType == PieceType.King)
+                        {
+                            valoareEuristica -= 50;
+                            break;
+                        }
+                    }
+                }
+                // pentru stanga-sus
+                if (piesa.X > 0 && piesa.Y < Size - 1)
+                {
+                    foreach (Piece piesaOm in Pieces)
+                    {
+                        // daca exista vreun rege de-al omului in stanga-sus, atunci piesa este in pericol
+                        if (piesaOm.Player == PlayerType.Human && piesaOm.X == piesa.X - 1 && piesaOm.Y == piesa.Y + 1 && piesaOm.PieceType == PieceType.King)
+                        {
+                            valoareEuristica -= 50;
+                            break;
+                        }
+                    }
+                }
+                // pentru dreapta-jos
+                if (piesa.X < Size - 1 && piesa.Y > 0)
+                {
+                    foreach (Piece piesaOm in Pieces)
+                    {
+                        // daca exista vreo piesa de-a omului in dreapta-jos, atunci piesa este in pericol
+                        if (piesaOm.Player == PlayerType.Human && piesaOm.X == piesa.X + 1 && piesaOm.Y == piesa.Y - 1)
+                        {
+                            valoareEuristica -= 50;
+                            break;
+                        }
+                    }
+                }
+                // pentru stanga-jos
+                if (piesa.X > 0 && piesa.Y > 0)
+                {
+                    foreach (Piece piesaOm in Pieces)
+                    {
+                        // daca exista vreo piesa de-a omului in stanga-jos, atunci piesa este in pericol
+                        if (piesaOm.Player == PlayerType.Human && piesaOm.X == piesa.X - 1 && piesaOm.Y == piesa.Y - 1)
+                        {
+                            valoareEuristica -= 50;
+                            break;
+                        }
+                    }
+                }
+            }
+
+                       
+
+            // pentru partea de final, cand computer-ul are deja piese de tip regi
+            // folosim comparatia intre numarul de regi ai computer-ului si numarul de regi ai omului
+            int nrRegiComputer = 0;
+            int nrRegiOm = 0;
+            foreach (Piece piesa in Pieces)
+            {
+                if (piesa.Player == PlayerType.Computer) // pentru computer
+                {
+                    if (piesa.PieceType == PieceType.King) // numaram regii computer-ului
+                    {
+                        ++nrRegiComputer;
+                    }
+                }
+                else // pentru om
+                {
+                    if (piesa.PieceType == PieceType.King) // numaram regii omului
+                    {
+                        ++nrRegiOm;
+                    }
+                }
+            }
+
+            if (nrRegiComputer == 0)
+            {
+                return valoareEuristica;
+            }
+
+            // daca se ajunge aici, computer-ul are regi si trebuie aplicata o strategie bazata pe distanta de la regi la piesele adversarului
+            List<int> valoareEuristicaDistantePanaLaPieseleOmului = new List<int>();
+            int valoareEuristicaDistanteCurenta;
+            foreach (Piece piesaComputer in Pieces)
+            {
+                if (piesaComputer.Player == PlayerType.Computer && piesaComputer.PieceType == PieceType.King)
+                {
+                    valoareEuristicaDistanteCurenta = 0;
+                    // pentru fiecare piesa a omului, valoareEuristicam distanta pana la ea
+                    foreach (Piece piesaOm in Pieces)
+                    {
+                        if (piesaOm.Player == PlayerType.Human)
+                        {
+                            // folosim distanta Manhattan
+                            valoareEuristicaDistanteCurenta += Math.Abs(piesaComputer.X - piesaOm.X) + Math.Abs(piesaComputer.Y - piesaOm.Y);
+                        }
+                    }
+                    valoareEuristicaDistantePanaLaPieseleOmului.Add(valoareEuristicaDistanteCurenta);
+                }
+            }
+
+            // daca computer-ul are mai multi regi decat omul, atunci aplica o strategie ofensiva (ataca) = minimizeaza valoareEuristica
+            if (nrRegiComputer >= nrRegiOm)
+            {
+                valoareEuristica = -valoareEuristica - valoareEuristicaDistantePanaLaPieseleOmului.Min();
 
             }
-            return 56 - diff;
+            // daca computer-ul are mai putini regi decat omul, atunci aplica o strategie defensiva (se apara) = maximizeaza valoareEuristica
+            else if (nrRegiComputer < nrRegiOm)
+            {
+                valoareEuristica += valoareEuristicaDistantePanaLaPieseleOmului.Max();
+            }
+
+            return valoareEuristica;
 
         }
 
