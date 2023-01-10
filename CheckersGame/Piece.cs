@@ -17,7 +17,7 @@
 namespace SimpleCheckers
 {
     public enum PlayerType { None, Computer, Human };
-    public enum PieceType { Checker, King };
+    public enum PieceType { Checker, Queen };
                 // cheker - este pion simplu care poate inainta diagonal inainte cate un patrat, 
             // exceptie poate sari peste o piesa a adversarului, inaintant 2 casute diagonal inainte
                 // king - un pio devine rege cand ajunge pe ultima linie a adversarului --> in acel moment

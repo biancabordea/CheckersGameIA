@@ -134,9 +134,9 @@ namespace SimpleCheckers
 
             // dama devine rege cand ajunge pe ultimul rand al adversarului
             if ((nextBoard.Pieces[move.PieceId].Player == PlayerType.Human || nextBoard.Pieces[move.PieceId].Player == PlayerType.Computer) &&
-                nextBoard.Pieces[move.PieceId].PieceType != PieceType.King && move.NewY == Size - 1)
+                nextBoard.Pieces[move.PieceId].PieceType != PieceType.Queen && move.NewY == Size - 1)
             {
-                nextBoard.Pieces[move.PieceId].PieceType = PieceType.King;
+                nextBoard.Pieces[move.PieceId].PieceType = PieceType.Queen;
             }
 
 

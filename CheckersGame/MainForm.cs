@@ -87,7 +87,7 @@ namespace SimpleCheckers
                 e.Graphics.FillEllipse(brush, (float)(6 + p.X * 62.5), (float)(dy - p.Y * 62.5), 50, 50);
 
                 // daca o dama devine regina, se va marca acest lucru
-                if (p.PieceType == PieceType.King)
+                if (p.PieceType == PieceType.Queen)
                 {
                     brush = transparentQueen;
                     e.Graphics.FillEllipse(brush, (float)(6 + p.X * 62.5), (float)(dy - p.Y * 62.5), 25, 25);
@@ -214,7 +214,7 @@ namespace SimpleCheckers
                     //g.FillEllipse(brush, (int)(12 + avx * 125), (int)(dy - avy * 125), 100, 100);
                     g.FillEllipse(brush, (float)(6 + avx * 62.5), (float)(dy - avy * 62.5), 50, 50);
 
-                    if (b1.Pieces[i].PieceType == PieceType.King)
+                    if (b1.Pieces[i].PieceType == PieceType.Queen)
                     {
                         brush = transparentKing;
                        g.FillEllipse(brush, (float)(6 + avx * 62.5), (float)(dy - avy * 62.5), 25, 25);
