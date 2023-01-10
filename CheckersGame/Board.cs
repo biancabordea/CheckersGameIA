@@ -34,27 +34,28 @@ namespace SimpleCheckers
         {
             Size = 8; // tabla este 8x8
             Pieces = new List<Piece>(Size * 3); // fiecare jucator are 3 randuri de piese
-            int randuriMax = 0;
             int id = 0;
 
-            // piesele trebuie amplasate doar pe patratele de culoare neagra
-            // piesele calculatorului
-            for (int i = 1; i < Size; i += 2)
+            // piese calculator
+            for (int i = 0; i < Size; i++)
             {
-                Pieces.Add(new Piece(i, Size - 1, i, PlayerType.Computer));
-                Pieces.Add(new Piece(i - 1, Size - 2, i, PlayerType.Computer));
-                Pieces.Add(new Piece(i, Size - 3, i, PlayerType.Computer));
+                Pieces.Add(new Piece(i, Size - 1 - (i + 1) % 2, id++, PlayerType.Computer, PieceType.Checker));
+            }
+            for (int i = 1; i < Size; i += 2) 
+            {
+                Pieces.Add(new Piece(i, Size - 3, id++, PlayerType.Computer, PieceType.Checker));
             }
 
-            // tabla jucatorului
-            for (int i = 0; i < Size; i+=2)
+            // piese om
+            for (int i = 0; i < Size; i++)
             {
-                Pieces.Add(new Piece(i, 0, i + Size, PlayerType.Human));
-                Pieces.Add(new Piece(i + 1, 1, i, PlayerType.Human));
-                Pieces.Add(new Piece(i, 2, i, PlayerType.Human));
+                Pieces.Add(new Piece(i, (i + 2) % 2, id++, PlayerType.Human, PieceType.Checker));
 
             }
-         
+            for (int i = 0; i < Size; i += 2) 
+            {
+                Pieces.Add(new Piece(i, 2, id++, PlayerType.Human, PieceType.Checker));
+            }
 
             /* for (int i = 0; i < Size; i++)
                    Pieces.Add(new Piece(i, Size - 1, i, PlayerType.Computer));
@@ -69,7 +70,7 @@ namespace SimpleCheckers
             Pieces = new List<Piece>(Size * 2);
 
             foreach (Piece p in b.Pieces)
-                Pieces.Add(new Piece(p.X, p.Y, p.Id, p.Player));
+                Pieces.Add(new Piece(p.X, p.Y, p.Id, p.Player, p.PieceType));
         }
 
         // public double EvaluationFunction() - completati aceasta metoda in fisierul Rezolvare.cs

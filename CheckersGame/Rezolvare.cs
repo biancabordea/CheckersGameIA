@@ -15,9 +15,14 @@ namespace SimpleCheckers
             int diff = 0;
             foreach (Piece piece in Pieces)
             {
+                if (piece.Player == PlayerType.Human)
+                {
+                    continue;
+                }
                 diff += piece.Y;
 
             }
+
             return 56 - diff;
 
         }
