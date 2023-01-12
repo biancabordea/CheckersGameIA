@@ -14,6 +14,7 @@
  *                                                                        *
  **************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,7 +27,7 @@ namespace SimpleCheckers
     {
         public int Size { get; set; } // dimensiunea tablei de joc
         public List<Piece> Pieces { get; set; } // lista de piese, atat ale omului cat si ale calculatorului
-        // public bool captureMade { get; set; } // daca s-a efectuat o captura in configuratia anterioara configuratiei curente
+        public bool capturePieces { get; set; } // daca s-a efectuat o captura in configuratia anterioara configuratiei curente
 
 
         // configuratie tabla de joc
@@ -67,6 +68,7 @@ namespace SimpleCheckers
         public Board(Board b)
         {
             Size = b.Size;
+            capturePieces = b.capturePieces;
             Pieces = new List<Piece>(Size * 2);
 
             foreach (Piece p in b.Pieces)
@@ -82,55 +84,56 @@ namespace SimpleCheckers
         {
             Board nextBoard = new Board(this); // copy
 
-            nextBoard.Pieces[move.PieceId].X = move.NewX;
-            nextBoard.Pieces[move.PieceId].Y = move.NewY;
+           
 
             // daca exista pe diagonala un oponent, poate fi capturat
-            int capturedPieceX = 0, capturedPieceY = 0;
+            int capturedPieceX = -1, capturedPieceY = -1;
             //se sare fix peste un oponent pe diagonala
             if (System.Math.Abs(move.NewX - nextBoard.Pieces[move.PieceId].X) == 2 && System.Math.Abs(move.NewY - nextBoard.Pieces[move.PieceId].Y) == 2)
             {
-                // stanga sus
-                if (move.NewX - nextBoard.Pieces[move.PieceId].X < 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y > 0)
+                // dreapta-sus
+                if (move.NewX - nextBoard.Pieces[move.PieceId].X > 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y > 0) 
                 {
-                    capturedPieceX = nextBoard.Pieces[move.PieceId].X - 1;
-                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y + 1;
+                    capturedPieceX = move.NewX - 1;
+                    capturedPieceY = move.NewY - 1;
                 }
-                //dreapta sus
-                else if (move.NewX - nextBoard.Pieces[move.PieceId].X > 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y > 0)
+                // stanga-sus
+                else if (move.NewX - nextBoard.Pieces[move.PieceId].X < 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y > 0) 
                 {
-                    capturedPieceX = nextBoard.Pieces[move.PieceId].X + 1;
-                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y + 1;
+                    capturedPieceX = move.NewX + 1;
+                    capturedPieceY = move.NewY - 1;
                 }
-                //stanga jos
-                else if (move.NewX - nextBoard.Pieces[move.PieceId].X < 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y < 0)
+                // dreapta-jos
+                else if (move.NewX - nextBoard.Pieces[move.PieceId].X > 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y < 0) 
                 {
-                    capturedPieceX = nextBoard.Pieces[move.PieceId].X - 1;
-                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y - 1;
+                    capturedPieceX = move.NewX - 1;
+                    capturedPieceY = move.NewY + 1;
                 }
-                //dreapta jos
-                else if (move.NewX - nextBoard.Pieces[move.PieceId].X > 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y < 0)
+                // stanga-jos
+                else if (move.NewX - nextBoard.Pieces[move.PieceId].X < 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y < 0) 
                 {
-                    capturedPieceX = nextBoard.Pieces[move.PieceId].X + 1;
-                    capturedPieceY = nextBoard.Pieces[move.PieceId].Y - 1;
+                    capturedPieceX = move.NewX + 1;
+                    capturedPieceY = move.NewY + 1;
                 }
-
-                //eliminam piesa oponent de pe tabla
-                foreach (Piece piece in Pieces)
+                for (int i = 0; i < nextBoard.Pieces.Count; ++i)
                 {
+                    Piece piece = nextBoard.Pieces.ElementAt<Piece>(i);
                     if (piece.X == capturedPieceX && piece.Y == capturedPieceY)
                     {
                         piece.X = -1;
                         piece.Y = -1;
-                        // nextBoard.captureMade = true;
+                        nextBoard.capturePieces = true;
                         break;
                     }
                 }
             }
             else
             {
-                // nextBoard.captureMade = false;
+                nextBoard.capturePieces = false;
             }
+
+            nextBoard.Pieces[move.PieceId].X = move.NewX;
+            nextBoard.Pieces[move.PieceId].Y = move.NewY;
 
             // dama devine rege cand ajunge pe ultimul rand al adversarului
             if ((nextBoard.Pieces[move.PieceId].Player == PlayerType.Human || nextBoard.Pieces[move.PieceId].Player == PlayerType.Computer) &&
@@ -143,8 +146,7 @@ namespace SimpleCheckers
             return nextBoard;
         }
 
-
-
+       
         /// <summary>
         /// Verifica daca configuratia curenta este castigatoare
         /// </summary>
@@ -152,17 +154,30 @@ namespace SimpleCheckers
         /// <param name="winner">Cine a castigat: omul sau calculatorul</param>
         public void CheckFinish(out bool finished, out PlayerType winner)
         {
-            if (Pieces.Where(p => p.Player == PlayerType.Human && p.Y == Size - 1).Count() == Size)
-            {
-                finished = true;
-                winner = PlayerType.Human;
-                return;
-            }
+            /* if (Pieces.Where(p => p.Player == PlayerType.Human && p.Y == Size - 1).Count() == Size)
+             {
+                 finished = true;
+                 winner = PlayerType.Human;
+                 return;
+             }
 
-            if (Pieces.Where(p => p.Player == PlayerType.Computer && p.Y == 0).Count() == Size)
+             if (Pieces.Where(p => p.Player == PlayerType.Computer && p.Y == 0).Count() == Size)
+             {
+                 finished = true;
+                 winner = PlayerType.Computer;
+                 return;
+             }*/
+            if (Pieces.Where(p => p.Player == PlayerType.Human && p.X == -1 && p.Y == -1).Count() == Size * 3 / 2)
             {
                 finished = true;
                 winner = PlayerType.Computer;
+                return;
+            }
+
+            if (Pieces.Where(p => p.Player == PlayerType.Computer && p.X == -1 && p.Y == -1).Count() == Size * 3 / 2)
+            {
+                finished = true;
+                winner = PlayerType.Human;
                 return;
             }
 

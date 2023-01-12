@@ -204,6 +204,12 @@ namespace SimpleCheckers
 
                 for (int i = 0; i < b1.Pieces.Count; i++)
                 {
+                    // daca piesa este capturata , nu mai este afisata
+                    if (b2.Pieces[i].X == -1 && b2.Pieces[i].Y == -1) 
+                    {
+                        continue; 
+                    }
+
                     double avx = (j * b2.Pieces[i].X + (noSteps - j) * b1.Pieces[i].X) / (double)noSteps;
                     double avy = (j * b2.Pieces[i].Y + (noSteps - j) * b1.Pieces[i].Y) / (double)noSteps;
 
@@ -217,7 +223,7 @@ namespace SimpleCheckers
                     if (b1.Pieces[i].PieceType == PieceType.Queen)
                     {
                         brush = transparentQueen;
-                       g.FillEllipse(brush, (float)(18 + avx * 62.5), (float)(dy - avy * 62.5 + 12), 25, 25);
+                        g.FillEllipse(brush, (float)(18 + avx * 62.5), (float)(dy - avy * 62.5 + 12), 25, 25);
 
                     }
                 }
