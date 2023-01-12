@@ -39,6 +39,10 @@ namespace SimpleCheckers
 
             foreach (Piece piece in Pieces)
             {
+                if (piece.Player == PlayerType.Human)
+                {
+                    continue;
+                }
                 // in mod general functia scade din numarul total de piese din joc (in cazul nostru 56)
                 // numarul de piese ale unui jucator si cele ale oponentului
 
@@ -175,6 +179,11 @@ namespace SimpleCheckers
                             break;
                         }
                     }
+                }
+
+                if (capturePieces)
+                {
+                    pondere += 2000;
                 }
 
                 // ne apropiem de finalul jocului, iar dupa toate miscarile, atat omul cat si calculatorul detin un numar de regi (adica au ajuns la linia din capatul jumatatii celuilalt de tabla)
