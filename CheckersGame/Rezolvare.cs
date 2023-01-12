@@ -11,23 +11,248 @@ namespace SimpleCheckers
         /// </summary>
         public double EvaluationFunction()
         {
-            //throw new Exception("Aceasta metoda trebuie implementata");
-            int diff = 0;
+            // cu cat functia aceasta este mai "inteligenta", cu atat calculatorul va juca mai bine
+
+            // consideram tabla de joc impartita in doua, sus sunt piesele computerului, jos cele ale omului
+
+            // functia de evaluare depinde de computer
+            // daca functia are o valoare mare, inseamna ca este un avantaj pentru computer
+            // o valoare mai mica a functiei inseamna un avantaj pentru om
+
+            // la fiecare mutare, i se va adauga computerului o pondere, a carei valoare se retine in variabila declarata
+            // cu cat o piesa a computerului este mai aproape de linia finala de pe jumatatea omului (deci sanse mai mari), ponderea va avea o valoare mai mare
+            // daca exista un dezavantaj pentru computer, ponderea adaugata va fi mai mica
+
+            // dupa cum spuneam anterior, considerand tabla de joc impartita in jumatate, daca se afla computerul in jumatatea de tabla corespunzatoare omului
+            // ponderea primita va fi mai mare pentru ca acesta se afla in avantaj si se apropie de linia finala
+            // pe de alta parte, daca omul avanseaza spre calculator iar computerul se afla ramas in jumatatea lui, ponderea atribuita este mai mica
+
+            // de mentionat este faptul ca ponderile sunt alese aleator, avand in vedere sa fie atribuite in mod corespunzator:
+            // avantaj = pondere mai mare, dezavantaj = pondere mai mica
+
+            // tinand cont de aceste ponderi, se poate stabili cine este in avantaj (pe baza valorii curente a functiei de evaluare statica) si are sanse sa castige
+
+            // de asemenea, toate mutarile si calculele vor fi facute luand in considerare pozitia pe baza coordonatelor X si Y ale pieselor
+
+            int pondere = 0; // initailizam cu 0 pentru ca este inceputul jocului
+            // piesele nu sunt mutate, deci nu exista avantaj sau dezavantaj pentru niciuna din parti
+
             foreach (Piece piece in Pieces)
             {
-                if (piece.Player == PlayerType.Human)
+                // in mod general functia scade din numarul total de piese din joc (in cazul nostru 56)
+                // numarul de piese ale unui jucator si cele ale oponentului
+
+                // pentru inceput stabilim o valoare (pondere) pentru piese
+                // avem in vedere: dama, care poate fi atat in jumatea computerului, cat si in cea a jucatorului
+                // pentru ca functia reprezinta cat de bine joaca calculatorul, dama din perimetrul acestuia va fi cu o valoare mai mare
+                // decat dama din perimetrul omului
+
+                // jocul contine si regi, piese care sunt importante si mai puternice decat damele
+                // in acest caz, indiferent de pozitia in care se afla, regii vor avea aceeasi valoare, una mai mare decat damele
+                if (piece.PieceType == PieceType.Queen)
                 {
-                    continue;
+                    pondere = pondere + 10;
                 }
-                diff += piece.Y;
+
+                if (piece.PieceType == PieceType.Checker) // dame
+                {
+                    // daca dama computerului se afla pe un rand in jumatatea de tabla a omului, are avantaj deci primeste 7
+                    // altfel, daca se afla in jumatatea lui de tabla, primeste doar 5
+                    pondere += (piece.Y < Size / 2) ? 7 : 5;
+                }
+
+                // pentru ca jocul este unul dinamic, trebuie tratate toate situatiile in care se pot afla piesele
+                // altfel spus, trebuie sa avem in vedere fiecare miscare care poate fi facuta de o piesa
+                // fiecare mutare, cu cat se apropie mai mult de zona de incoronare, este evaluata cu 2
+
+                // PRIMA MISCARE
+                // prima data, dama pleaca din perimetrul ei de joc si merge spre centru
+                // tabla fiind 8 x 8, consideram centrul ca fiind 4
+                // totodata, numerotarea liniilor se considera de la 0, in cazul nostru cifrele de la 0 la 7 reprezinta cele 8 linii
+                // in acest moment tratam cazul de plecare, deci nu vrem sa ajungem in centru (4) si punem conditie ca dama sa se afla in perimetrul 0 - 3
+                if (piece.X > 0 && piece.X < Size - 1 && piece.Y > Size - 3 && piece.Y < Size - 1)
+                {
+                    pondere = pondere + 2;
+                    // am ales valoarea 2 pentru ca nu vorbim despre un avantaj, este o simpla mutare, fara sa se ajunga in centru, deci nu a avansat prea mult spre linia finala
+                }
+
+                // A DOUA MISCARE
+                // daca dama a parasit pozitia initiala, aceasta a avansat catre centru si il poate controla
+                // centrul tablei de joc este considerat intre liniile 2 - 5 (excludem cele 2 linii din fiecare capat)
+                if (piece.X > 2 && piece.X < Size - 2 && piece.Y > 2 && piece.Y < Size - 3)
+                {
+                    pondere = pondere + 4; // se avanseaza catre liniile finale, exista un avantaj, deci o astfel de miscare aduce o pondere mai mare
+                }
+
+                // A TREIA MISCARE
+                // dupa miscarile din centru, damele se apropie de linia finala, deci se afla in avantaj
+                // acest caz trebuie tratat avand in vedere ca piesa sa fie dama, pentru ca doar ele pot fi incoronate
+                // si in functie de coordonatele X si Y trebuie stabilit daca se afla in permetrul apropiat zonei de incoronare
+                if (piece.PieceType == PieceType.Checker && piece.X > 0 && piece.X < Size - 1 && piece.Y > 0 && piece.Y < 3)
+                {
+                    pondere = pondere + 6;
+                }
+
+                // A PATRA MISCARE
+                // daca damele se afla in zona de incoronare si pot face o mutare spre aceasta
+                // adica din penultimul rand pot muta spre ultimul si devin incoronate, ponderea se dubleaza
+                if (piece.PieceType == PieceType.Checker && piece.Y == 0) // daca e dama ajunsa pe ultimul rand
+                {
+                    pondere = pondere + 12;
+                }
+
+                // am terminat tratarea celor 4 cazuri de miscari pe care le pot face damele
+                // urmeaza sa valorificam configuratia jocului in urma miscarilor care au avut loc pana in acel moment
+                // si tratam cazurile de capturare in functie de pozitiile pieselor
+                // daca computerul se va afla intr-un pericol (poate fi capturata de om), acesta este in dezavantaj, functia trebuie sa scada
+                // deci atribuim o pondere cu -, care sa fie mai mare decat suma posibila adunata in urma mutarilor anterioare
+                // noi o vom considera -35, astfel evidentiem dezavantajul computerului
+
+                // daca s-a intrat in oricare dintre cele 4 bucle posibile, inseamna ca piesa a fost capturata
+                // evidentiem dezavantajul computerului printr-o decrementare majora
+                // cu break iesim din bucla foreach respectiva pentru ca inseamna ca piesa a fost capturata acolo
+
+                // prin human din foreach ma refer la piesa omului
+
+                // piesa a computerului pe cale de capturare de catre om aflata in partea de jos a tablei
+                // dama JOS-DREAPTA
+                if (piece.X < Size - 1 && piece.Y > 0) // perimetrul pentru dreapta jos
+                {
+                    foreach (Piece human in Pieces)
+                    {
+                        // cautam in perimetrul tablei din dreapta jos in caz de se afla o dama de la om care pune o piesa a computerului in pericol
+                        if (piece.X < Size - 1 && piece.Y > 0)
+                        {
+                            if (human.Player == PlayerType.Human && human.X == piece.X + 1 && human.Y == piece.Y - 1)
+                            {
+                                pondere = pondere - 35; // capturat de om
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // rege SUS-DREAPTA
+                if (piece.X < Size - 1 && piece.Y < Size - 1)
+                {
+                    foreach (Piece human in Pieces)
+                    {
+                        // cautam in perimetrul tablei din dreapta sus in caz de se afla un rege de la om care pune o piesa a computerului in pericol
+                        if (piece.X < Size - 1 && piece.Y < Size - 1)
+                        {
+                            if (human.PieceType == PieceType.Queen && human.Player == PlayerType.Human && human.X == piece.X + 1 && piece.Y == piece.Y + 1)
+                            {
+                                pondere = pondere - 35; // capturat de om
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // dama JOS-STANGA
+                if (piece.X > 0 && piece.Y > 0)
+                {
+                    foreach (Piece human in Pieces)
+                    {
+                        // cautam in perimetrul tablei din stanga jos in caz ca se afla un rege de la om care pune o piesa a computerului in pericol
+                        if (human.Player == PlayerType.Human && human.X == piece.X - 1 && piece.Y == piece.Y - 1)
+                        {
+                            pondere = pondere - 35; // capturat de om
+                            break;
+                        }
+                    }
+                }
+
+                // rege SUS-STANGA
+                if (piece.X > 0 && piece.Y < Size - 1)
+                {
+                    foreach (Piece human in Pieces)
+                    {
+                        // cautam in perimetrul tablei din stanga sus in caz ca se afla un rege de la om care pune o piesa a computerului in pericol
+                        if (human.PieceType == PieceType.Queen && human.Player == PlayerType.Human && human.X == piece.X - 1 && human.Y == piece.Y + 1)
+                        {
+                            pondere = pondere - 35; // capturat de om
+                            break;
+                        }
+                    }
+                }
+
+                // ne apropiem de finalul jocului, iar dupa toate miscarile, atat omul cat si calculatorul detin un numar de regi (adica au ajuns la linia din capatul jumatatii celuilalt de tabla)
+                // contorizam numarul de regi computerului
+                int noOfComputerQueens = Pieces.Count(p => p.Player == PlayerType.Computer && p.PieceType == PieceType.Queen);
+                // contorizam numarul de regi omului
+                int noOfHumanQueens = Pieces.Count(p => p.Player != PlayerType.Computer && p.PieceType == PieceType.Queen);
+
+                // ne intereseaza numarul de regi ai computerului pentru ca sa stabilim in ce forma se afla spre sfarsitul jocului si cum sa continue
+                if (noOfComputerQueens == 0)
+                {
+                    return pondere;
+                    // in acest moment returnam valoarea functiei de evaluare asa cum este pentru a vedea scorul mic al computerului
+                    // fiind aproape sfarsitul jocului, iar el daca nu are regi, inseamna ca este intr-un dezavantaj considerabil
+                    // trebuie sa incerce sa faca miscari ca sa isi imbunatateasca pozitia
+
+                    // totodata, atunci cand o piesa devine rege ea se poate misca in toate directiile
+                    // daca nu are regi, calculatorul are si optiuni limitate de actiune iar sansele de castig scad
+
+                }
+
+                // daca se ajunge in acest punct, inseamna ca exista regi ai computerului si trebuie sa actioneze
+                // fiind finalul jocului, computerul trebuie sa faca ceva ca sa poata castiga
+                // in acest moment il intereseaza ce miscari inteligente poate face in continuare ca sa aiba sanse de castig
+                // mutarile depind de piesele omului, deci trebuie calculata distanta pana la ele
+
+                // vom declara o lista in care sa retinem distantele de la regi la piesele adversarului
+                // pentru cazul nostru, cea mai potrivita metoda de calcul este bazata pe distanta Manhattan
+
+                // pentru 2 puncte A(x1, y1) si B(x2, y2) situate intr-un sistem xOy se va folosi distanta Manhattan 
+                // care se calculeaza astfel: abs(x1- x2) + abs(y1 – y2)
+
+                // de ce Manhattan? pentru ca este cea mai utilizata si totodata cea mai eficienta metoda
+                // in cazul tablelor de sah sau a altora asemenea unde se pot face miscari doar in anumite directii
+                // aceasta corespunde numarului minim de miscari pe care trebuie sa le faca o piesa pentru a ajunge de la un punct la altul
+                // presupunand ca se poate misca doar orizontal sau vertical
+
+                List<int> ManhattanDistances =
+                    Pieces.Where(p => p.Player == PlayerType.Computer && p.PieceType == PieceType.Queen)
+                        .Select(p => Pieces.Where(h => h.Player == PlayerType.Human)
+                        .Sum(h => Math.Abs(p.X - h.X) + Math.Abs(p.Y - h.Y))).ToList();
+
+                // pe linia cu Where filtram piesele pentru a retine doar regii computerului
+                // cu .Select folosim regii pe care i-am filtrat anterior ca sa calculam 
+                // distanta Manhattan dintre ei si toate celelalte piese ale omului ramase
+                // rezultatele sunt adaugate in lista cu ToList()
+
+                // pe baza distantelor rezultate aplicam strategia de joc cu algoritmul MinMax
+
+                // CAZUL 1 - cand computerul are mai multi regi decat jucatorul, deci este in avantaj
+                // STRATEGIE - ataca si captureaza cat mai mult
+
+                // acesta trebuie sa-si foloseasca avantajul pentru a pune presiune asupra omului
+                // minimizarea distantei presupune ca regii sunt mai aproape de piesele omului, deci este foarte probabil sa le poata captura
+                // minimizarea distantei inseamna maximizarea sanselor de atac asupra pieselor omului, reducand numarul acestora
+                if (noOfComputerQueens >= noOfHumanQueens)
+                {
+                    pondere = -pondere - ManhattanDistances.Min();
+                }
+
+                // CAZUL 2 - cand computerul are mai putini regi decat jucatorul, deci este in dezavantaj
+                // STRATEGIE - evita atacul si se concentreaza pe protejarea pieselor
+
+                // in acest caz computerul trebuie sa-si maximizeze distanta dintre piesele lui si cele ale omului
+                // pentru a evita sa fie capturate, deci scopul este sa reduca sansa de atac a omului
+                // daca se indeparteaza, isi protejeaza piesele deci jocul va dura mai mult pentru ca in acest timp
+                // computerul cauta oportunitati de a-si recastiga pozitia si sa castige jocul
+                if (noOfComputerQueens < noOfHumanQueens)
+                {
+                    pondere = pondere + ManhattanDistances.Max();
+                }
 
             }
-
-            return 56 - diff;
+            return pondere;
 
         }
 
-      
+
 
     }
 
@@ -105,7 +330,7 @@ namespace SimpleCheckers
                 }
             }
 
-           
+
 
 
             // verificam daca pionul este dama, deoarece acest pion nu se poate intoarce
@@ -116,7 +341,7 @@ namespace SimpleCheckers
                 {
                     return false;
                 }
-                
+
             }
 
 
@@ -147,17 +372,17 @@ namespace SimpleCheckers
                     skipY = Y - 1;
                 }
 
-                
-                foreach (Piece piesa in currentBoard.Pieces) 
+
+                foreach (Piece piesa in currentBoard.Pieces)
                 {
                     if (piesa.X == skipX && piesa.Y == skipY)
                     {
                         if (!isOpponent(piesa.Player))
                         {
-                            return false; 
+                            return false;
                         }
                         skip = true;
-                        break; 
+                        break;
                     }
                 }
                 if (!skip)
@@ -183,119 +408,118 @@ namespace SimpleCheckers
     }
 
 
-        //=============================================================================================================================
+    //=============================================================================================================================
 
-        public partial class Minimax
+    public partial class Minimax
+    {
+        /// <summary>
+        /// Primeste o configuratie ca parametru, cauta mutarea optima si returneaza configuratia
+        /// care rezulta prin aplicarea acestei mutari optime
+        /// </summary>
+        /* public static Board FindNextBoard(Board currentBoard)
+         {
+             throw new Exception("Aceasta metoda trebuie implementata");
+         }
+        */
+
+        public static ActionsGame AlphaBetaPruningFunction(ActionsGame node, bool maxLevel, int depth, double alfa, double beta)
         {
-            /// <summary>
-            /// Primeste o configuratie ca parametru, cauta mutarea optima si returneaza configuratia
-            /// care rezulta prin aplicarea acestei mutari optime
-            /// </summary>
-           /* public static Board FindNextBoard(Board currentBoard)
+            PlayerType winner;
+            bool finished;
+            node.board.CheckFinish(out finished, out winner);
+            // daca jocul s-a terminat/ s-a ajuns intr-un nod terminal/s-a ajuns la adancimea max 
+            if (depth <= 0 || finished) // am ajuns pe nod terminal, la limita de adancime impusa, sau jocul s-a incheiat
             {
-                throw new Exception("Aceasta metoda trebuie implementata");
-
+                return node;
             }
-           */
+            // jucatorul maximizant este calc si cel minimizant este persoana
+            ActionsGame result = new ActionsGame();
 
-            public static ActionsGame AlphaBetaPruningFunction(ActionsGame node, bool maxLevel,  int depth, double alfa, double beta)
+            // in cazul in care jucatorul este persoana
+            if (!maxLevel)
             {
-                PlayerType winner;
-                bool finished;
-                node.board.CheckFinish(out finished, out winner);
-                // daca jocul s-a terminat/ s-a ajuns intr-un nod terminal/s-a ajuns la adancimea max 
-                if (depth <= 0 || finished) // am ajuns pe nod terminal, la limita de adancime impusa, sau jocul s-a incheiat
-                {
-                    return node;
-                }
-                // jucatorul maximizant este calc si cel minimizant este persoana
-                ActionsGame result = new ActionsGame();
+                result.evaluation = Double.PositiveInfinity;
+                List<Board> possibleConifg = TakePossibleConfig(PlayerType.Human, node);
 
-                // in cazul in care jucatorul este persoana
-                if (!maxLevel)
+                // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
+                foreach (Board board in possibleConifg)
                 {
-                    result.evaluation = Double.PositiveInfinity;
-                    List<Board> possibleConifg = TakePossibleConfig(PlayerType.Human, node);
+                    // creeam cate o configuratie din cele posibile
+                    ActionsGame action = new ActionsGame();
+                    action.board = board;
+                    action.evaluation = board.EvaluationFunction();
 
-                    // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
-                    foreach (Board board in possibleConifg)
+                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                    // val optima
+                    if (nextAction.evaluation < result.evaluation) // consideram valoarea maxima a functiei de evaluare
                     {
-                        // creeam cate o configuratie din cele posibile
-                        ActionsGame action = new ActionsGame();
-                        action.board = board;
-                        action.evaluation = board.EvaluationFunction();
-
-                        ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
-                        // val optima
-                        if (nextAction.evaluation < result.evaluation) // consideram valoarea maxima a functiei de evaluare
-                        {
-                            result = nextAction; // se trece la urmatoarea actiune
-                            result.board = board;
-                        }
-
-                        if (alfa >= beta) // nu se mai incearca alte actiuni
-                        {
-                            break;
-                        }
-
-                        beta = Math.Min(beta, result.evaluation);
+                        result = nextAction; // se trece la urmatoarea actiune
+                        result.board = board;
                     }
-                }
-                else // in cazul in care jucatorul este computer
-                {
-                    result.evaluation = Double.NegativeInfinity;
-                    List<Board> possibleConifg = TakePossibleConfig(PlayerType.Computer, node);
 
-                    // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
-                    foreach (Board board in possibleConifg)
+                    if (alfa >= beta) // nu se mai incearca alte actiuni
                     {
-                        // creeam cate o configuratie din cele posibile
-                        ActionsGame action = new ActionsGame();
-                        action.board = board;
-                        action.evaluation = board.EvaluationFunction();
-
-                        ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
-                        // val optima
-                        if (nextAction.evaluation > result.evaluation) // consideram valoarea maxima a functiei de evaluare
-                        {
-                            result = nextAction; // se trece la urmatoarea actiune
-                            result.board = board;
-                        }
-
-                        if (alfa >= beta) // nu se mai incearca alte actiuni
-                        {
-                            break;
-                        }
-
-                        alfa = Math.Max(alfa, result.evaluation);
+                        break;
                     }
+
+                    beta = Math.Min(beta, result.evaluation);
                 }
-                    return result;
             }
-            
-            /// <summary>
-            /// Functie care va parcurge fiecare piesa de pe tabla si va returna o lista cu configuratiile posibile
-            /// </summary>
-            private static List<Board> TakePossibleConfig(PlayerType player, ActionsGame config)
+            else // in cazul in care jucatorul este computer
             {
-                List<Board> candidates = new List<Board>();
-                
-            // pentru fiecare piesa de pe tabla
-                foreach (Piece piece in config.board.Pieces)
+                result.evaluation = Double.NegativeInfinity;
+                List<Board> possibleConifg = TakePossibleConfig(PlayerType.Computer, node);
+
+                // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
+                foreach (Board board in possibleConifg)
                 {
-                    // se verifica tipul jucatorului pentru a putea ajuta urmatorul pas in functia principala
-                    if ( piece.Player == player )
+                    // creeam cate o configuratie din cele posibile
+                    ActionsGame action = new ActionsGame();
+                    action.board = board;
+                    action.evaluation = board.EvaluationFunction();
+
+                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                    // val optima
+                    if (nextAction.evaluation > result.evaluation) // consideram valoarea maxima a functiei de evaluare
                     {
-                        // pentru mutarile valide ale piesei curente, se va realiza o configuratia posibila
-                        foreach (Move move in piece.ValidMoves(config.board))
-                        {
-                            candidates.Add(config.board.MakeMove(move));
-                        }
+                        result = nextAction; // se trece la urmatoarea actiune
+                        result.board = board;
                     }
+
+                    if (alfa >= beta) // nu se mai incearca alte actiuni
+                    {
+                        break;
+                    }
+
+                    alfa = Math.Max(alfa, result.evaluation);
                 }
-                    return candidates;
             }
-            
+            return result;
         }
-    
+
+        /// <summary>
+        /// Functie care va parcurge fiecare piesa de pe tabla si va returna o lista cu configuratiile posibile
+        /// </summary>
+        private static List<Board> TakePossibleConfig(PlayerType player, ActionsGame config)
+        {
+            List<Board> candidates = new List<Board>();
+
+            // pentru fiecare piesa de pe tabla
+            foreach (Piece piece in config.board.Pieces)
+            {
+                // se verifica tipul jucatorului pentru a putea ajuta urmatorul pas in functia principala
+                if (piece.Player == player)
+                {
+                    // pentru mutarile valide ale piesei curente, se va realiza o configuratia posibila
+                    foreach (Move move in piece.ValidMoves(config.board))
+                    {
+                        candidates.Add(config.board.MakeMove(move));
+                    }
+                }
+            }
+            return candidates;
+        }
+
+    }
+
 }
