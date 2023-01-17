@@ -275,7 +275,6 @@ namespace SimpleCheckers
         /// </summary>
         public List<Move> ValidMoves(Board currentBoard)
         {
-            //throw new Exception("Aceasta metoda trebuie implementata");
             List<Move> validMoves = new List<Move>();
 
             for (int x = -2; x <= 2; ++x)
@@ -297,17 +296,11 @@ namespace SimpleCheckers
         /// </summary>
         public bool IsValidMove(Board currentBoard, Move move)
         {
-            //throw new Exception("Aceasta metoda trebuie implementata");
-            // nu se muta nicio piesa
-            //nu muta in afara tablei
-            // nu muta in careu ocupat
-            // sare mai multe careuri, cu exceptia cand poate manca un adversat pe diagonala
-
-
 
             int xDiff = Math.Abs(move.NewX - X);
             int yDiff = Math.Abs(move.NewY - Y);
-            // mutarea nu are voie in acest stadiu sa fie mai mare de 1 patrat
+
+            // verificam ca mutarea - distanta dintre pozitia curenta si noua mutare -  sa nu fie mai mare de un 1 
             if (!(xDiff == 2 && yDiff == 2))
             {
                 // verificam ca distanta dintre pozitia curenta si noua mutare este 1
@@ -316,7 +309,7 @@ namespace SimpleCheckers
                     return false;
                 }
 
-                // pionul se va misca doar pe diagonala
+                // verificam ca pionul se va misca doar pe diagonala
                 if (Y != move.NewY - (move.NewX - X) && Y != move.NewY + (move.NewX - X))
                 {
                     return false;
@@ -339,9 +332,6 @@ namespace SimpleCheckers
                 }
             }
 
-
-
-
             // verificam daca pionul este dama, deoarece acest pion nu se poate intoarce
             if (currentBoard.Pieces[move.PieceId].PieceType == PieceType.Checker)
             {
@@ -354,11 +344,11 @@ namespace SimpleCheckers
             }
 
 
-            // mutare pe diagonala peste 2 casete, cand unul dintre pioni fura poinul celuilalt
+            // mutare pe diagonala peste 2 casete, cand unul dintre pioni fura pionul celuilalt
             if (xDiff == 2 && yDiff == 2)
             {
                 bool skip = false;
-                int skipX = -1, skipY = -1; // piesa peste care sa se sara
+                int skipX = -1, skipY = -1; // piesa peste care sa se sara - care este mancata
 
                 if (move.NewX - X > 0 && move.NewY - Y > 0) // dreapta-sus
                 {
@@ -381,18 +371,19 @@ namespace SimpleCheckers
                     skipY = Y - 1;
                 }
 
-
-                foreach (Piece piesa in currentBoard.Pieces)
+                //verificam daca piesa este oponent
+                foreach (Piece piece in currentBoard.Pieces)
                 {
-                    if (piesa.X == skipX && piesa.Y == skipY)
-                    {
-                        if (!isOpponent(piesa.Player))
+                    
+                     if (piece.X == skipX && piece.Y == skipY)
+                     {
+                        if (!isOpponent(piece.Player))
                         {
-                            return false;
+                            return false; // daca piesa nu este a adversarului, atunci mutarea nu este valida
                         }
                         skip = true;
-                        break;
-                    }
+                        break; // in cazul in mutarea este valida, nu se va mai cauta
+                     }
                 }
                 if (!skip)
                 {
@@ -437,7 +428,7 @@ namespace SimpleCheckers
             bool finished;
             node.board.CheckFinish(out finished, out winner);
             // daca jocul s-a terminat/ s-a ajuns intr-un nod terminal/s-a ajuns la adancimea max 
-            if (depth <= 0 || finished) // am ajuns pe nod terminal, la limita de adancime impusa, sau jocul s-a incheiat
+            if (depth <= 0 || finished) 
             {
                 return node;
             }

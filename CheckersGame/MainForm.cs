@@ -63,15 +63,13 @@ namespace SimpleCheckers
              
             float dy = 500 - 62.5f + 6;
             SolidBrush transparentRed = new SolidBrush(Color.FromArgb(192, 255, 0, 0));
-            SolidBrush transparentGreen = new SolidBrush(Color.FromArgb(192, 0, 128, 0));
+            SolidBrush transparentBlack = new SolidBrush(Color.FromArgb(192, 0, 0, 0));
             SolidBrush transparentYellow = new SolidBrush(Color.FromArgb(192, 255, 255, 0));
 
             // marcam faptul ca o dama devine regina
             SolidBrush transparentQueen = new SolidBrush(Color.FromArgb(255, 255, 255, 0));
 
-            // trebuie sa adaugam pentru regine
-
-
+      
             foreach (Piece p in _board.Pieces)
             {
                 SolidBrush brush = transparentRed;
@@ -80,7 +78,7 @@ namespace SimpleCheckers
                     if (p.Id == _selected)
                         brush = transparentYellow;
                     else
-                        brush = transparentGreen;
+                        brush = transparentBlack;
                 }
 
               //  e.Graphics.FillEllipse(brush, 12 + p.X * 125, dy - p.Y * 125, 100, 100);
@@ -189,7 +187,7 @@ namespace SimpleCheckers
             Bitmap board = new Bitmap(_boardImage);
             float dy = 500 - 62.5f + 6;
             SolidBrush transparentRed = new SolidBrush(Color.FromArgb(192, 255, 0, 0));
-             SolidBrush transparentGreen = new SolidBrush(Color.FromArgb(192, 0, 128, 0));
+             SolidBrush transparentBlack = new SolidBrush(Color.FromArgb(192, 0, 0, 0));
             SolidBrush transparentQueen = new SolidBrush(Color.FromArgb(255, 255, 255, 0));
 
 
@@ -215,7 +213,7 @@ namespace SimpleCheckers
 
                     SolidBrush brush = transparentRed;
                     if (b1.Pieces[i].Player == PlayerType.Human)
-                        brush = transparentGreen;
+                        brush = transparentBlack;
 
                     //g.FillEllipse(brush, (int)(12 + avx * 125), (int)(dy - avy * 125), 100, 100);
                     g.FillEllipse(brush, (float)(6 + avx * 62.5), (float)(dy - avy * 62.5), 50, 50);
@@ -258,7 +256,7 @@ namespace SimpleCheckers
 
         private void pictureBoxBoard_Click(object sender, EventArgs e)
         {
-
+            pictureBoxBoard.BringToFront();
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -268,6 +266,17 @@ namespace SimpleCheckers
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox1_Click_1(object sender, EventArgs e)
+        {
+           // pictureBox1.SendToBack();
 
         }
     }
