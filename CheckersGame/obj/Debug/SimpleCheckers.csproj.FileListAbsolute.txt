@@ -20,3 +20,14 @@ D:\AN 4\SEM 1\IA\PROIECT\CheckersGame\CheckersGameIA\CheckersGame\obj\Debug\Simp
 D:\AN 4\SEM 1\IA\PROIECT\CheckersGame\CheckersGameIA\CheckersGame\obj\Debug\SimpleCheckers.csproj.CoreCompileInputs.cache
 D:\AN 4\SEM 1\IA\PROIECT\CheckersGame\CheckersGameIA\CheckersGame\obj\Debug\SimpleCheckers.exe
 D:\AN 4\SEM 1\IA\PROIECT\CheckersGame\CheckersGameIA\CheckersGame\obj\Debug\SimpleCheckers.pdb
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\bin\Debug\SimpleCheckers.exe.config
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\bin\Debug\SimpleCheckers.exe
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\bin\Debug\SimpleCheckers.pdb
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.csprojAssemblyReference.cache
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.FirstForm.resources
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.MainForm.resources
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.Properties.Resources.resources
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.csproj.GenerateResource.cache
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.csproj.CoreCompileInputs.cache
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.exe
+D:\AC AN IV SEM I\IA\Proiect\NewClone\CheckersGame\obj\Debug\SimpleCheckers.pdb
