@@ -34,7 +34,6 @@ namespace SimpleCheckers
             Application.Run(new MainForm());
         }
 
-
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             const string copyright =
@@ -44,8 +43,7 @@ namespace SimpleCheckers
                 "           - Bordea Bianca\r\n" +
                 "           - Dumbrava Petronela\r\n" +                
                 "           - Ghiorghiu Andreea\r\n" +
-                "Grupa: 1411B\r\n"
-                ;
+                "Grupa: 1411B\r\n";
 
             MessageBox.Show(copyright, "Despre jocul Dame simple");
         }
