@@ -10,7 +10,7 @@ namespace SimpleCheckers
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FirstForm());
+            Application.Run(new MainForm());
         }
     }
 }
