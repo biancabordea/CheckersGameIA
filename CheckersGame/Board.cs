@@ -75,15 +75,12 @@ namespace SimpleCheckers
                 Pieces.Add(new Piece(p.X, p.Y, p.Id, p.Player, p.PieceType));
         }
 
-        // public double EvaluationFunction() - completati aceasta metoda in fisierul Rezolvare.cs
-
         /// <summary>
         /// Creeaza o noua configuratie aplicand mutarea primita ca parametru in configuratia curenta
         /// </summary>
         public Board MakeMove(Move move)
         {
             Board nextBoard = new Board(this); // copy
-
            
 
             // daca exista pe diagonala un oponent, poate fi capturat
@@ -156,27 +153,15 @@ namespace SimpleCheckers
         /// <param name="winner">Cine a castigat: omul sau calculatorul</param>
         public void CheckFinish(out bool finished, out PlayerType winner)
         {
-            /* if (Pieces.Where(p => p.Player == PlayerType.Human && p.Y == Size - 1).Count() == Size)
-             {
-                 finished = true;
-                 winner = PlayerType.Human;
-                 return;
-             }
-
-             if (Pieces.Where(p => p.Player == PlayerType.Computer && p.Y == 0).Count() == Size)
-             {
-                 finished = true;
-                 winner = PlayerType.Computer;
-                 return;
-             }*/
-            if (Pieces.Where(p => p.Player == PlayerType.Human && p.X == -1 && p.Y == -1).Count() == Size * 3 / 2)
+           
+            if (Pieces.Where(p => p.Player == PlayerType.Human && p.X == -1 && p.Y == -1).Count() == 12)
             {
                 finished = true;
                 winner = PlayerType.Computer;
                 return;
             }
 
-            if (Pieces.Where(p => p.Player == PlayerType.Computer && p.X == -1 && p.Y == -1).Count() == Size * 3 / 2)
+            if (Pieces.Where(p => p.Player == PlayerType.Computer && p.X == -1 && p.Y == -1).Count() == 12 )
             {
                 finished = true;
                 winner = PlayerType.Human;
