@@ -241,10 +241,15 @@ namespace SimpleCheckers
         private void despreToolStripMenuItem_Click(object sender, EventArgs e)
         {
             const string copyright =
-                "Algoritmul minimax\r\n" +
-                "Inteligenta artificiala, Laboratorul 8\r\n" +
-                "(c)2016-2017 Florin Leon\r\n" +
-                "http://florinleon.byethost24.com/lab_ia.htm";
+                "Regulile jocului: \r\n" +
+                " - la începutul jocului toate piesele sunt dame \r\n" +
+                " - damele se pot muta doar înainte pe diagonală, o singură poziție \r\n" +
+                " - damele se pot muta două poziții (pătrate) doar dacă capturează o piesă a adversarului" +
+                " (acesta trebuie să se afle la o distanță de o poziție, tot diagonal înainte) \r\n" +
+                " - o damă devine regină în momentul în care ajunge pe ultima linie, din capătul opus al tablei, raportat la poziția inițială. \r\n" +
+                " - o regină se poate deplasa în orice direcție, dar tot diagonal înainte \r\n" +
+                "\r\n" +
+                "";
 
             MessageBox.Show(copyright, "Despre jocul Dame simple");
         }

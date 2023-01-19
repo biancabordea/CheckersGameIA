@@ -428,7 +428,7 @@ namespace SimpleCheckers
             bool finished;
             node.board.CheckFinish(out finished, out winner);
             // daca jocul s-a terminat/ s-a ajuns intr-un nod terminal/s-a ajuns la adancimea max 
-            if (depth <= 0 || finished) 
+            if (depth <= 0 || depth > maxDepth || finished) 
             {
                 return node;
             }
@@ -436,9 +436,10 @@ namespace SimpleCheckers
             ActionsGame result = new ActionsGame();
 
             // in cazul in care jucatorul este persoana
-            if (!maxLevel)
+            if (!maxLevel) // maxLever != true - persoana
             {
-                result.evaluation = Double.PositiveInfinity;
+                result.evaluation = Double.PositiveInfinity; // valoarea MIN
+                // lista cu configuratiile posibilie pentru jucatorul de tip persoana
                 List<Board> possibleConifg = TakePossibleConfig(PlayerType.Human, node);
 
                 // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
@@ -449,13 +450,17 @@ namespace SimpleCheckers
                     action.board = board;
                     action.evaluation = board.EvaluationFunction();
 
-                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                    // se cauta o mutare suficient de buna 
+                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth + 1, alfa, beta);
                     // val optima
-                    if (nextAction.evaluation < result.evaluation) // consideram valoarea maxima a functiei de evaluare
+                    
+                    if (nextAction.evaluation < result.evaluation) // se va considera valoarea maxima a functiei
                     {
                         result = nextAction; // se trece la urmatoarea actiune
                         result.board = board;
+                        beta = result.evaluation; // val < val_minima
                     }
+
 
                     if (alfa >= beta) // nu se mai incearca alte actiuni
                     {
@@ -466,8 +471,10 @@ namespace SimpleCheckers
                 }
             }
             else // in cazul in care jucatorul este computer
+                 // maxLever == true - calc
             {
                 result.evaluation = Double.NegativeInfinity;
+                // lista cu configuratiile posibilie pentru jucatorul de tip computer
                 List<Board> possibleConifg = TakePossibleConfig(PlayerType.Computer, node);
 
                 // aplicare retezare alfa beta pentru fiecare configuratie dintre cele posibile
@@ -478,12 +485,16 @@ namespace SimpleCheckers
                     action.board = board;
                     action.evaluation = board.EvaluationFunction();
 
-                    ActionsGame nextAction = AlphaBetaPruningFunction(action, false, depth - 1, alfa, beta);
+                    // se cauta o mutare suficient de buna 
+                    ActionsGame nextAction = AlphaBetaPruningFunction(action, true, depth + 1, alfa, beta);
+
                     // val optima
+                    
                     if (nextAction.evaluation > result.evaluation) // consideram valoarea maxima a functiei de evaluare
                     {
                         result = nextAction; // se trece la urmatoarea actiune
                         result.board = board;
+                        alfa = result.evaluation; // val > val_maxima
                     }
 
                     if (alfa >= beta) // nu se mai incearca alte actiuni
