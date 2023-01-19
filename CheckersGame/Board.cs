@@ -80,17 +80,21 @@ namespace SimpleCheckers
         /// </summary>
         public Board MakeMove(Move move)
         {
-            Board nextBoard = new Board(this); // copy
-           
+            Board nextBoard = new Board(this); // creaza o copie a bordului curent
 
-            // daca exista pe diagonala un oponent, poate fi capturat
+
+
+            // coordonatele piesei capturate
             int capturedPieceX = -1, capturedPieceY = -1;
-            //se sare fix peste un oponent pe diagonala
+            // se verifica daca se face saltul peste un oponent pe diagonala (stanga - 
+            // dreapta, sus - jos) pentru a putea fi capturat
             if (System.Math.Abs(move.NewX - nextBoard.Pieces[move.PieceId].X) == 2 && System.Math.Abs(move.NewY - nextBoard.Pieces[move.PieceId].Y) == 2)
             {
                 // dreapta-sus
                 if (move.NewX - nextBoard.Pieces[move.PieceId].X > 0 && move.NewY - nextBoard.Pieces[move.PieceId].Y > 0) 
                 {
+                    // piesa capturata primeste coordonatele pozitiei/spatiului de pe 
+                    // diagonala dreapta-sus
                     capturedPieceX = move.NewX - 1;
                     capturedPieceY = move.NewY - 1;
                 }
@@ -112,6 +116,9 @@ namespace SimpleCheckers
                     capturedPieceX = move.NewX + 1;
                     capturedPieceY = move.NewY + 1;
                 }
+
+                // se parcurge  lista de piese aflate pe tabla
+                // se cauta piesa capturata si se scoate in afara bordului
                 for (int i = 0; i < nextBoard.Pieces.Count; ++i)
                 {
                     Piece piece = nextBoard.Pieces.ElementAt<Piece>(i);
@@ -128,7 +135,7 @@ namespace SimpleCheckers
             {
                 nextBoard.capturePieces = false;
             }
-
+            // mutarea piesei pe tabla
             nextBoard.Pieces[move.PieceId].X = move.NewX;
             nextBoard.Pieces[move.PieceId].Y = move.NewY;
 
